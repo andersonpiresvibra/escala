@@ -270,7 +270,11 @@
                 id="btn_options_dropdown">
           @if (getLoggedCollab()) {
             @let loggedH = getLoggedCollab()!;
-            <div class="md:hidden w-full h-full bg-slate-800 flex items-center justify-center text-emerald-500 font-bold text-xs overflow-hidden shrink-0">
+            <div class="md:hidden w-full h-full flex items-center justify-center font-bold text-xs overflow-hidden shrink-0"
+                 [class.bg-slate-200]="isLightTheme()"
+                 [class.text-slate-800]="isLightTheme()"
+                 [class.bg-slate-800]="!isLightTheme()"
+                 [class.text-emerald-500]="!isLightTheme()">
                @if (loggedH.photoUrl || loggedH.photo) {
                  <img [src]="getCollabPhoto(loggedH)" class="w-full h-full object-cover">
                } @else {
@@ -2761,7 +2765,7 @@
                 <div class="lg:col-span-8 space-y-3">
                   
                   @if (activeSubTab() === 'escala') {
-                  <div id="panel-trabalho-folga" [class]="'w-full border rounded-[16px] p-5 space-y-5 transition-all duration-300 ' + (isLightTheme() ? 'bg-white border-slate-200 text-slate-900 shadow-md' : 'bg-[#0F172A] border-[#334155] text-[#F8FAFC] shadow-lg')" [class.hidden]="activeSubTab() !== 'escala'">
+                  <div id="panel-trabalho-folga" [class]="'w-full border rounded-[4px] p-5 space-y-5 transition-all duration-300 ' + (isLightTheme() ? 'bg-white border-slate-200 text-slate-900 shadow-md' : 'bg-[#0F172A] border-[#334155] text-[#F8FAFC] shadow-lg')" [class.hidden]="activeSubTab() !== 'escala'">
                   
                   <!-- HEADER / TABS (SPLIT 50% / 50%) -->
                   <div id="trabalho-folga-header" class="w-full pb-0 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -3782,9 +3786,6 @@
                                 <p [class]="'text-[10px] font-black truncate ' + (isLightTheme() ? 'text-slate-800' : 'text-white')">
                                   {{ col.name }}
                                 </p>
-                                <p [class]="'text-[8px] font-bold uppercase tracking-wider truncate ' + (isLightTheme() ? 'text-slate-500' : 'text-slate-400')">
-                                  {{ col.role }} &bull; {{ col.sector || 'Geral' }}
-                                </p>
                               </div>
                             </div>
                             <span class="text-[7px] font-black font-mono px-1.5 py-0.5 rounded border uppercase shrink-0 transition-colors"
@@ -3841,6 +3842,14 @@
 
                 <!-- FILTER SELECTOR TABS (MOVED TO BOTTOM) -->
                 <div id="team-filter-container" class="grid grid-cols-2 sm:grid-cols-4 p-1 rounded-xl gap-1 mt-2" [class]="isLightTheme() ? 'bg-slate-100' : 'bg-[#071426]'">
+                  <button id="btn-filter-meio-turno" (click)="coworkersFilter.set('MEIO-TURNO')"
+                          class="py-2.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer flex items-center justify-center gap-1.5 border-none outline-none shadow-xs active:scale-95"
+                          [class]="coworkersFilter() === 'MEIO-TURNO' ? 
+                                   (isLightTheme() ? 'bg-white text-slate-850 shadow-md border-b border-slate-200' : 'bg-emerald-500 text-emerald-950 font-black') : 
+                                   (isLightTheme() ? 'text-slate-500 hover:text-slate-700' : 'text-slate-400 hover:text-slate-200')">
+                    <span class="material-icons text-[11px]">schedule</span>
+                    <span class="truncate">Meu Turno</span>
+                  </button>
                   <button id="btn-filter-manha" (click)="coworkersFilter.set('MANHÃ')"
                           class="py-2.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer flex items-center justify-center gap-1.5 border-none outline-none shadow-xs active:scale-95"
                           [class]="coworkersFilter() === 'MANHÃ' ? 
@@ -3856,14 +3865,6 @@
                                    (isLightTheme() ? 'text-slate-500 hover:text-slate-700' : 'text-slate-400 hover:text-slate-200')">
                     <span class="material-icons text-[11px]">wb_twilight</span>
                     <span class="truncate">Tarde</span>
-                  </button>
-                  <button id="btn-filter-meio-turno" (click)="coworkersFilter.set('MEIO-TURNO')"
-                          class="py-2.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer flex items-center justify-center gap-1.5 border-none outline-none shadow-xs active:scale-95"
-                          [class]="coworkersFilter() === 'MEIO-TURNO' ? 
-                                   (isLightTheme() ? 'bg-white text-slate-850 shadow-md border-b border-slate-200' : 'bg-emerald-500 text-emerald-950 font-black') : 
-                                   (isLightTheme() ? 'text-slate-500 hover:text-slate-700' : 'text-slate-400 hover:text-slate-200')">
-                    <span class="material-icons text-[11px]">nights_stay</span>
-                    <span class="truncate">Meio-turno</span>
                   </button>
                   <button id="btn-filter-todos" (click)="coworkersFilter.set('TODOS')"
                           class="py-2.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all duration-300 cursor-pointer flex items-center justify-center gap-1.5 border-none outline-none shadow-xs active:scale-95"
@@ -3971,25 +3972,7 @@
         <span class="text-[9px] font-black uppercase tracking-wider">Escala</span>
       </button>
  
-      <!-- PERFIL -->
-      <button (click)="changeMobileTab('perfil', $event)"
-              (touchend)="changeMobileTab('perfil', $event)"
-              class="flex flex-col items-center justify-center py-2.5 px-1 flex-1 gap-1 rounded-lg transition-all border-none outline-none cursor-pointer active:scale-95 active:bg-slate-500/10 pointer-events-auto select-none"
-              style="touch-action: manipulation; min-height: 48px;"
-              [class]="activeSubTab() === 'perfil' ? 'bg-[#10B981] text-white shadow-md' : (isLightTheme() ? 'text-slate-500 hover:text-slate-700' : 'text-slate-400 hover:text-slate-200')">
-        <span class="material-icons text-lg">account_circle</span>
-        <span class="text-[9px] font-black uppercase tracking-wider">Perfil</span>
-      </button>
  
-      <!-- EQUIPE -->
-      <button (click)="changeMobileTab('equipe', $event)"
-              (touchend)="changeMobileTab('equipe', $event)"
-              class="flex flex-col items-center justify-center py-2.5 px-1 flex-1 gap-1 rounded-lg transition-all border-none outline-none cursor-pointer active:scale-95 active:bg-slate-500/10 pointer-events-auto select-none"
-              style="touch-action: manipulation; min-height: 48px;"
-              [class]="(activeSubTab() === 'equipe' || activeSubTab() === 'team') ? 'bg-[#10B981] text-white shadow-md' : (isLightTheme() ? 'text-slate-500 hover:text-slate-700' : 'text-slate-400 hover:text-slate-200')">
-        <span class="material-icons text-lg">groups</span>
-        <span class="text-[9px] font-black uppercase tracking-wider">Equipe</span>
-      </button>
  
       <!-- INDICADORES -->
       <button (click)="changeMobileTab('indicadores', $event)"
